@@ -27,7 +27,6 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
-        
         children: [
           // Background Image
           Container(

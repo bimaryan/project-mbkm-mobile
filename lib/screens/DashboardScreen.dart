@@ -1,11 +1,13 @@
-// DashboardScreen.dart
-// ignore_for_file: library_private_types_in_public_api, prefer_const_constructors, prefer_const_literals_to_create_immutables, file_names
+// ignore_for_file: file_names, duplicate_ignore, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
-import 'detail_bahan.dart'; // Import halaman detail bahan
-import '../main.dart'; // Pastikan untuk mengimpor main.dart
-import 'peminjaman.dart'; // Import halaman peminjaman
-import 'informasi.dart'; // Import halaman informasi
+import 'package:project_mbkm/main.dart';
+import 'detail_bahan.dart';
+import 'detail_alat.dart';
+import 'detail_ruangan.dart';
+import 'peminjaman.dart';
+import 'informasi.dart';
+import 'profil.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -16,6 +18,85 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedTabIndex = 0;
+  int _bottomSelectedTabIndex = 0;
+  final Map<String, int> itemQuantities = {};
+
+  // Daftar item untuk setiap kategori
+  final Map<String, List<Map<String, String>>> categories = {
+    'Alat & Bahan': [
+      {
+        "name": "Perban",
+        "stock": "Stok: 5",
+        "image": 'assets/perban_image.jpg',
+        "description": "Deskripsi Perban"
+      },
+      {
+        "name": "Tensimeter",
+        "stock": "Stok: 5",
+        "image": 'assets/tensimeter_image.jpg',
+        "description": "Deskripsi Tensimeter"
+      },
+      {
+        "name": "Ruangan A",
+        "stock": "Available",
+        "image": 'assets/room_image_a.jpg',
+        "description": "Deskripsi Ruangan A"
+      },
+    ],
+    'Alat': [
+      {
+        "name": "Alat Bedah Minor",
+        "stock": "Stok: 5",
+        "image": 'assets/bedah_minor_image.jpg',
+        "description": "Deskripsi Alat Bedah Minor"
+      },
+      {
+        "name": "Stetoskop",
+        "stock": "Stok: 5",
+        "image": 'assets/stetoskop_image.jpg',
+        "description": "Deskripsi Stetoskop"
+      },
+    ],
+    'Bahan': [
+      {
+        "name": "Betadine",
+        "stock": "Stok: 5",
+        "image": 'assets/betadine_image.jpg',
+        "description": "Deskripsi Betadine"
+      },
+      {
+        "name": "Kapas Steril",
+        "stock": "Stok: 5",
+        "image": 'assets/kapas_steril_image.jpg',
+        "description": "Deskripsi Kapas Steril"
+      },
+    ],
+    'Lain-lain': [
+      {
+        "name": "Ruangan A",
+        "stock": "Available",
+        "image": 'assets/room_image_a.jpg',
+        "description": "Deskripsi Ruangan A"
+      },
+      {
+        "name": "Ruangan B",
+        "stock": "Available",
+        "image": 'assets/room_image_b.jpg',
+        "description": "Deskripsi Ruangan B"
+      },
+    ]
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    // Inisialisasi jumlah untuk setiap item
+    for (var category in categories.values) {
+      for (var item in category) {
+        itemQuantities[item['name']!] = 0; // Pastikan ini adalah integer
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,9 +129,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       body: Column(
         children: [
+          // Bagian profil
           Container(
             padding: const EdgeInsets.all(16.0),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage('assets/background_image.jpg'),
                 fit: BoxFit.cover,
@@ -60,90 +142,99 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 CircleAvatar(
                   radius: 40,
-                  backgroundImage: AssetImage('assets/profile_background.jpg'),
                   backgroundColor: Colors.grey.shade200,
+                  backgroundImage: const AssetImage(
+                      'assets/profile_background.jpg'), // Gambar profil
                 ),
                 const SizedBox(width: 16),
-                const Text(
-                  'BIMA RYAN HITAM PEKAT',
-                  style: TextStyle(
-                    fontSize: 22,
-                    color: Color.fromARGB(255, 0, 0, 0),
-                    fontWeight: FontWeight.bold,
-                  ),
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Gustian Prayoga Januar',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    Text(
+                      '2205042', // Contoh user ID
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
+
+          // Bagian Tab untuk kategori
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                _buildTabItem('Alat', 0),
-                _buildTabItem('Bahan', 1),
-                _buildTabItem('lain-lain', 2),
+                _buildTabItem('Alat & Bahan', 0),
+                _buildTabItem('Alat', 1),
+                _buildTabItem('Bahan', 2),
+                _buildTabItem('Lain-lain', 3),
               ],
             ),
           ),
+
+          // Daftar item yang akan ditampilkan
           Expanded(
-            child: GridView.builder(
-              padding: EdgeInsets.all(10),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 0.75,
-              ),
+            child: ListView.builder(
+              itemCount: categories[getCurrentCategory()]?.length ?? 0,
               itemBuilder: (context, index) {
-                List<String> bahanList = [
-                  "Bahan A",
-                  "Bahan B",
-                  "Bahan C",
-                  "Bahan D",
-                ];
-
-                List<String> deskripsiList = [
-                  "Deskripsi Bahan A: Digunakan untuk ...",
-                  "Deskripsi Bahan B: Kegunaan dalam ...",
-                  "Deskripsi Bahan C: Bahan kimia untuk ...",
-                  "Deskripsi Bahan D: Alat bantu untuk ...",
-                ];
-
-                return _buildGridItem(
+                final item = categories[getCurrentCategory()]![index];
+                return _buildListItem(
                   context,
-                  bahanList[index % bahanList.length],
-                  deskripsiList[index % deskripsiList.length],
+                  item['name']!,
+                  item['stock']!,
+                  item['image']!,
+                  item['description']!,
                 );
               },
-              itemCount: 6,
             ),
           ),
         ],
       ),
+
+      // Bottom navigation bar
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedTabIndex,
+        currentIndex: _bottomSelectedTabIndex,
         onTap: (index) {
           if (index == 1) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PeminjamanScreen(),
+                builder: (context) => const PeminjamanScreen(),
               ),
             );
           } else if (index == 2) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => InformasiScreen(),
+                builder: (context) => const InformasiScreen(),
+              ),
+            );
+          } else if (index == 3) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ProfilScreen(),
               ),
             );
           }
           setState(() {
-            _selectedTabIndex = index;
+            _bottomSelectedTabIndex = index;
           });
         },
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Bahan & Alat',
@@ -163,23 +254,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
         selectedItemColor: Colors.teal,
         unselectedItemColor: Colors.teal,
-        selectedLabelStyle: TextStyle(color: Colors.teal),
-        unselectedLabelStyle: TextStyle(color: Colors.teal),
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
       ),
     );
   }
 
+  // Fungsi untuk membangun setiap tab
   Widget _buildTabItem(String label, int index) {
     return GestureDetector(
       onTap: () {
         setState(() {
           _selectedTabIndex = index;
+
+          // Jika kategori 'Alat & Bahan' dipilih, reset ke index 0
+          if (index == 0) {
+            _bottomSelectedTabIndex = 0; // Kembali ke Alat & Bahan
+          }
         });
       },
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20.0),
         decoration: BoxDecoration(
           color:
               _selectedTabIndex == index ? Colors.teal : Colors.grey.shade200,
@@ -196,49 +291,119 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildGridItem(
-      BuildContext context, String namaBahan, String deskripsiBahan) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DetailBahanScreen(
-              namaBahan: namaBahan,
-              deskripsiBahan: deskripsiBahan,
+  // Fungsi untuk membangun setiap item dalam list
+  Widget _buildListItem(BuildContext context, String title, String stock,
+      String imagePath, String description) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: GestureDetector(
+        onTap: () {
+          final currentCategory = getCurrentCategory();
+
+          // Navigasi ke detail item sesuai kategori
+          if (currentCategory == 'Alat & Bahan') {
+            if (categories['Alat']!.any((item) => item['name'] == title)) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetailAlatScreen(
+                    namaAlat: title,
+                    deskripsiAlat: description,
+                    imagePath: imagePath,
+                  ),
+                ),
+              );
+            } else if (categories['Bahan']!
+                .any((item) => item['name'] == title)) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetailBahanScreen(
+                    namaBahan: title,
+                    deskripsiBahan: description,
+                    imagePath: imagePath,
+                  ),
+                ),
+              );
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetailRuanganScreen(
+                    namaRuangan: title,
+                    deskripsiRuangan: description,
+                    imagePath: imagePath,
+                  ),
+                ),
+              );
+            }
+          } else if (currentCategory == 'Alat') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetailAlatScreen(
+                  namaAlat: title,
+                  deskripsiAlat: description,
+                  imagePath: imagePath,
+                ),
+              ),
+            );
+          } else if (currentCategory == 'Bahan') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetailBahanScreen(
+                  namaBahan: title,
+                  deskripsiBahan: description,
+                  imagePath: imagePath,
+                ),
+              ),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetailRuanganScreen(
+                  namaRuangan: title,
+                  deskripsiRuangan: description,
+                  imagePath: imagePath,
+                ),
+              ),
+            );
+          }
+        },
+        child: Card(
+          elevation: 3,
+          margin: const EdgeInsets.symmetric(
+              vertical: 8.0), // Menambahkan jarak antara item
+          child: ListTile(
+            leading: Image.asset(
+              imagePath,
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
             ),
-          ),
-        );
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        elevation: 5,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                height: 80,
-                width: 80,
-                color: Colors.grey.shade300,
-                child: Center(child: Text('GAMBAR')),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                namaBahan,
-                style: TextStyle(fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 5),
-              Text(
-                'status',
-                style: TextStyle(color: Colors.green),
-              ),
-            ],
+            title: Text(title),
+            subtitle: Text(stock),
           ),
         ),
       ),
     );
+  }
+
+  // Fungsi untuk mendapatkan kategori saat ini
+  String getCurrentCategory() {
+    switch (_selectedTabIndex) {
+      case 0:
+        return 'Alat & Bahan';
+      case 1:
+        return 'Alat';
+      case 2:
+        return 'Bahan';
+      case 3:
+        return 'Lain-lain';
+      default:
+        return 'Alat & Bahan';
+    }
   }
 }
