@@ -81,29 +81,8 @@ class _KatalogScreenState extends State<KatalogScreen> {
   void _filterBarangs(String category) {
     setState(() {
       _selectedCategory = category;
-      _currentPage = 1; // Reset to the first page
-      _barangs.clear(); // Clear the existing data for fresh fetch
-      _hasMoreData = true; // Reset pagination
     });
-    _fetchData(); // Fetch data again with the new category
-  }
-
-  void _nextPage() {
-    if (_hasMoreData) {
-      setState(() {
-        _currentPage++; // Increase the page number
-      });
-      _fetchData(); // Fetch data for the next page
-    }
-  }
-
-  void _prevPage() {
-    if (_currentPage > 1) {
-      setState(() {
-        _currentPage--; // Decrease the page number
-      });
-      _fetchData(); // Fetch data for the previous page
-    }
+    _fetchData();
   }
 
   @override
@@ -202,28 +181,6 @@ class _KatalogScreenState extends State<KatalogScreen> {
                         ),
             ),
           ),
-
-          // Page navigation and current page indicator
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: _prevPage,
-                  child: const Text('Prev'),
-                ),
-                Text(
-                  'Page $_currentPage',
-                  style: const TextStyle(fontSize: 16),
-                ),
-                ElevatedButton(
-                  onPressed: _nextPage,
-                  child: const Text('Next'),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
       bottomNavigationBar: BottomNavBar(
@@ -245,6 +202,7 @@ class _KatalogScreenState extends State<KatalogScreen> {
           Text(
             category,
             style: TextStyle(
+              fontSize: 18, // Increase font size
               color: _selectedCategory == category
                   ? const Color(0xFF0E9F6E)
                   : Colors.black,
