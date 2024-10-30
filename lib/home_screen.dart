@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:project_mbkm/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'bottom_nav_bar.dart'; // Import the bottom nav bar
+import 'bottom_nav_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required String token});
@@ -16,7 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<dynamic> _barangs = [];
   bool _isLoading = true;
   String? _errorMessage;
-  String _selectedCategory = 'Semua'; // Default category
+  String _selectedCategory = 'Semua';
 
   @override
   void initState() {
@@ -32,8 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final token =
-          prefs.getString('auth_token'); // Retrieve the token from storage
+      final token = prefs.getString('auth_token');
 
       if (token == null) {
         setState(() {
@@ -44,12 +43,12 @@ class _HomeScreenState extends State<HomeScreen> {
       }
 
       final url = Uri.parse(
-          'https://86ea-103-148-130-53.ngrok-free.app/api/home?kategori=$_selectedCategory'); // Include selected category in the URL
+          'https://e6c7-182-0-248-96.ngrok-free.app/api/home?kategori=$_selectedCategory');
       final response = await http.get(
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Send the token in the header
+          'Authorization': 'Bearer $token',
         },
       );
 
@@ -77,75 +76,42 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedCategory = category;
     });
-    _fetchData(); // Fetch data again with the new category
-  }
-
-  void _onBottomNavTapped(int index) {
-    setState(() {
-    });
+    _fetchData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SILK',
-            style: TextStyle(color: Colors.white)), // White text
-        backgroundColor: const Color(0xFF0E9F6E), // Green background color
+        title: const Text('SILK', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF0E9F6E),
       ),
       body: Column(
         children: [
-          // Category filter buttons
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  onPressed: () => _filterBarangs('Semua'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _selectedCategory == 'Semua'
-                        ? const Color.fromARGB(255, 14, 159, 110)
-                        : Colors.white,
-                    foregroundColor: _selectedCategory == 'Semua'
-                        ? Colors.white // White text for selected button
-                        : Colors.black, // Black text for unselected button
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildCategoryButton('Semua'),
+                      const SizedBox(width: 10),
+                      _buildCategoryButton('Alat'),
+                      const SizedBox(width: 10),
+                      _buildCategoryButton('Bahan'),
+                    ],
                   ),
-                  child: Text('Semua'),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () => _filterBarangs('Alat'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _selectedCategory == 'Alat'
-                        ? const Color.fromARGB(255, 14, 159, 110)
-                        : Colors.white,
-                    foregroundColor: _selectedCategory == 'Alat'
-                        ? Colors.white // White text for selected button
-                        : Colors.black, // Black text for unselected button
-                  ),
-                  child: Text('Alat'),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () => _filterBarangs('Bahan'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _selectedCategory == 'Bahan'
-                        ? const Color.fromARGB(255, 14, 159, 110)
-                        : Colors.white,
-                    foregroundColor: _selectedCategory == 'Bahan'
-                        ? Colors.white // White text for selected button
-                        : Colors.black, // Black text for unselected button
-                  ),
-                  child: Text('Bahan'),
                 ),
               ],
             ),
           ),
-          // Displaying fetched data
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(10.0),
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _errorMessage != null
@@ -156,16 +122,51 @@ class _HomeScreenState extends State<HomeScreen> {
                             final barang = _barangs[index];
                             return Card(
                               margin: const EdgeInsets.symmetric(vertical: 8.0),
-                              child: ListTile(
-                                leading: Image.network(
-                                  barang['foto'] ?? '',
-                                  width: 50,
-                                  height: 50,
-                                  fit: BoxFit.cover,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 4,
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: [
+                                    Image.network(
+                                      barang['foto'] ?? '',
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            barang['nama_barang'],
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Stok: ${barang['stok']}',
+                                            style: const TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Kategori: ${barang['kategori']}',
+                                            style: const TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                title: Text(barang['nama_barang']),
-                                subtitle: Text(
-                                    'Stok: ${barang['stok']}\nKategori: ${barang['kategori']}'),
                               ),
                             );
                           },
@@ -177,9 +178,37 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavBar(
         currentIndex: Routes.routeToIndex[Routes.home]!,
         onTap: (index) {
-          setState(() {
-          });
+          setState(() {});
         },
+      ),
+    );
+  }
+
+  Widget _buildCategoryButton(String category) {
+    return GestureDetector(
+      onTap: () => _filterBarangs(category),
+      child: Column(
+        children: [
+          Text(
+            category,
+            style: TextStyle(
+              color: _selectedCategory == category
+                  ? const Color(0xFF0E9F6E)
+                  : Colors.black,
+              fontWeight: _selectedCategory == category
+                  ? FontWeight.bold
+                  : FontWeight.normal,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Container(
+            height: 2,
+            width: 50,
+            color: _selectedCategory == category
+                ? const Color(0xFF0E9F6E)
+                : Colors.transparent,
+          ),
+        ],
       ),
     );
   }

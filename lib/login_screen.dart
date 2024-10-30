@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:project_mbkm/routes.dart';
@@ -25,8 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final identifier = _identifierController.text;
     final password = _passwordController.text;
-    final url = Uri.parse(
-        'https://86ea-103-148-130-53.ngrok-free.app/api/login'); // Replace with your actual API URL
+    final url = Uri.parse('https://e6c7-182-0-248-96.ngrok-free.app/api/login');
 
     try {
       final response = await http.post(
@@ -73,36 +73,121 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: _identifierController,
-              decoration: const InputDecoration(labelText: 'Username/NIM'),
+      body: Stack(
+        children: [
+          // Background image with blur effect
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/iteralab.png',
+              fit: BoxFit.cover,
             ),
-            TextField(
-              controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
+          ),
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0), // Blur effect
+            child: Container(
+              color: Colors.black.withOpacity(0.5), // Semi-transparent overlay
             ),
-            const SizedBox(height: 20),
-            if (_errorMessage != null)
-              Text(
-                _errorMessage!,
-                style: const TextStyle(color: Colors.red),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 30, left: 150),
+            child: Image.asset(
+                'assets/images/polindra.png',
+                height: 100,
               ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _isLoading ? null : loginUser,
-              child: _isLoading ? const CircularProgressIndicator() : const Text('Login'),
+          ),
+          // Centered card
+          Center(
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 4,
+              color: Colors.white, // Card color
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Login',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF0E9F6E), // Green color
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 20),
+                    // Username/NIM label
+                    const Text(
+                      'Username/NIM',
+                      style: TextStyle(color: Color(0xFF0E9F6E)),
+                    ),
+                    TextField(
+                      controller: _identifierController,
+                      decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                              color: Color(0xFF0E9F6E)), // Border color
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                              color: Color(0xFF0E9F6E)), // Border color
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // Password label
+                    const Text(
+                      'Password',
+                      style: TextStyle(color: Color(0xFF0E9F6E)),
+                    ),
+                    TextField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                              color: Color(0xFF0E9F6E)), // Border color
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                              color: Color(0xFF0E9F6E)), // Border color
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                      obscureText: true,
+                    ),
+                    const SizedBox(height: 20),
+                    if (_errorMessage != null)
+                      Text(
+                        _errorMessage!,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      height: 50, // Increased button height
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : loginUser,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              const Color(0xFF0E9F6E), // Button color
+                        ),
+                        child: _isLoading
+                            ? const CircularProgressIndicator()
+                            : const Text('Login'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

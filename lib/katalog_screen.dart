@@ -16,9 +16,9 @@ class _KatalogScreenState extends State<KatalogScreen> {
   final List<dynamic> _barangs = [];
   bool _isLoading = true;
   String? _errorMessage;
-  String _selectedCategory = 'Semua'; // Default category
-  int _currentPage = 1; // Current page for pagination
-  bool _hasMoreData = true; // To track if more data is available
+  String _selectedCategory = 'Semua';
+  int _currentPage = 1;
+  bool _hasMoreData = true;
 
   @override
   void initState() {
@@ -27,7 +27,7 @@ class _KatalogScreenState extends State<KatalogScreen> {
   }
 
   Future<void> _fetchData() async {
-    if (!_hasMoreData) return; // Prevent fetching if no more data
+    if (!_hasMoreData) return;
 
     setState(() {
       _isLoading = true;
@@ -47,17 +47,14 @@ class _KatalogScreenState extends State<KatalogScreen> {
       }
 
       final url = Uri.parse(
-          'https://86ea-103-148-130-53.ngrok-free.app/api/katalog?kategori=$_selectedCategory&page=$_currentPage');
+          'https://e6c7-182-0-248-96.ngrok-free.app/api/home?kategori=$_selectedCategory');
       final response = await http.get(
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Send the token in the header
+          'Authorization': 'Bearer $token',
         },
       );
-
-      print('Status code: ${response.statusCode}');
-      print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -91,9 +88,22 @@ class _KatalogScreenState extends State<KatalogScreen> {
     _fetchData(); // Fetch data again with the new category
   }
 
-  void _onBottomNavTapped(int index) {
-    setState(() {
-    });
+  void _nextPage() {
+    if (_hasMoreData) {
+      setState(() {
+        _currentPage++; // Increase the page number
+      });
+      _fetchData(); // Fetch data for the next page
+    }
+  }
+
+  void _prevPage() {
+    if (_currentPage > 1) {
+      setState(() {
+        _currentPage--; // Decrease the page number
+      });
+      _fetchData(); // Fetch data for the previous page
+    }
   }
 
   @override
@@ -107,47 +117,22 @@ class _KatalogScreenState extends State<KatalogScreen> {
         children: [
           // Category filter buttons
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  onPressed: () => _filterBarangs('Semua'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _selectedCategory == 'Semua'
-                        ? const Color.fromARGB(255, 14, 159, 110)
-                        : Colors.white,
-                    foregroundColor: _selectedCategory == 'Semua'
-                        ? Colors.white
-                        : Colors.black,
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildCategoryButton('Semua'),
+                      const SizedBox(width: 10),
+                      _buildCategoryButton('Alat'),
+                      const SizedBox(width: 10),
+                      _buildCategoryButton('Bahan'),
+                    ],
                   ),
-                  child: Text('Semua'),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () => _filterBarangs('Alat'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _selectedCategory == 'Alat'
-                        ? const Color.fromARGB(255, 14, 159, 110)
-                        : Colors.white,
-                    foregroundColor: _selectedCategory == 'Alat'
-                        ? Colors.white
-                        : Colors.black,
-                  ),
-                  child: Text('Alat'),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () => _filterBarangs('Bahan'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _selectedCategory == 'Bahan'
-                        ? const Color.fromARGB(255, 14, 159, 110)
-                        : Colors.white,
-                    foregroundColor: _selectedCategory == 'Bahan'
-                        ? Colors.white
-                        : Colors.black,
-                  ),
-                  child: Text('Bahan'),
                 ),
               ],
             ),
@@ -155,7 +140,7 @@ class _KatalogScreenState extends State<KatalogScreen> {
           // Displaying fetched data
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(10.0),
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _errorMessage != null
@@ -166,43 +151,117 @@ class _KatalogScreenState extends State<KatalogScreen> {
                             final barang = _barangs[index];
                             return Card(
                               margin: const EdgeInsets.symmetric(vertical: 8.0),
-                              child: ListTile(
-                                leading: Image.network(
-                                  barang['foto'] ?? '',
-                                  width: 50,
-                                  height: 50,
-                                  fit: BoxFit.cover,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 4,
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Row(
+                                  children: [
+                                    Image.network(
+                                      barang['foto'] ?? '',
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            barang['nama_barang'],
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Stok: ${barang['stok']}',
+                                            style: const TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          Text(
+                                            'Kategori: ${barang['kategori']}',
+                                            style: const TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                title: Text(barang['nama_barang']),
-                                subtitle: Text(
-                                    'Stok: ${barang['stok']}\nKategori: ${barang['kategori']}'),
                               ),
                             );
                           },
                         ),
             ),
           ),
-          if (_hasMoreData) // Show a loading indicator if there's more data to fetch
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _currentPage++; // Increase the page number
-                  });
-                  _fetchData(); // Fetch data for the next page
-                },
-                child: const Text('Load More'),
-              ),
+
+          // Page navigation and current page indicator
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: _prevPage,
+                  child: const Text('Prev'),
+                ),
+                Text(
+                  'Page $_currentPage',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                ElevatedButton(
+                  onPressed: _nextPage,
+                  child: const Text('Next'),
+                ),
+              ],
             ),
+          ),
         ],
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: Routes.routeToIndex[Routes.katalog]!,
         onTap: (index) {
           setState(() {
+            // Handle bottom navigation tap
           });
         },
+      ),
+    );
+  }
+
+  Widget _buildCategoryButton(String category) {
+    return GestureDetector(
+      onTap: () => _filterBarangs(category),
+      child: Column(
+        children: [
+          Text(
+            category,
+            style: TextStyle(
+              color: _selectedCategory == category
+                  ? const Color(0xFF0E9F6E)
+                  : Colors.black,
+              fontWeight: _selectedCategory == category
+                  ? FontWeight.bold
+                  : FontWeight.normal,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Container(
+            height: 2,
+            width: 50,
+            color: _selectedCategory == category
+                ? const Color(0xFF0E9F6E)
+                : Colors.transparent,
+          ),
+        ],
       ),
     );
   }

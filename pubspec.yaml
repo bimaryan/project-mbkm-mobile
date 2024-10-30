@@ -22,17 +22,6 @@ dev_dependencies:
   flutter_lints: ^2.0.0
 
 flutter:
-  uses-material-design: true
-
   assets:
-  - assets/background_image.jpg
-  - assets/profile_background.jpg
-  - assets/perban_image.jpg
-  - assets/tensimeter_image.jpg
-  - assets/bedah_minor_image.jpg
-  - assets/betadine_image.jpg
-  - assets/kapas_steril_image.jpg
-  - assets/stetoskop_image.jpg
-  - assets/room_image_a.jpg
-  - assets/room_image_b.jpg
-
+    - assets/images/
+  uses-material-design: true
