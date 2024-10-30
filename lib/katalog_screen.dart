@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:project_mbkm/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'bottom_nav_bar.dart';
 
@@ -16,7 +17,6 @@ class _KatalogScreenState extends State<KatalogScreen> {
   bool _isLoading = true;
   String? _errorMessage;
   String _selectedCategory = 'Semua'; // Default category
-  int _currentIndex = 0;
   int _currentPage = 1; // Current page for pagination
   bool _hasMoreData = true; // To track if more data is available
 
@@ -93,8 +93,6 @@ class _KatalogScreenState extends State<KatalogScreen> {
 
   void _onBottomNavTapped(int index) {
     setState(() {
-      _currentIndex =
-          index;
     });
   }
 
@@ -200,8 +198,11 @@ class _KatalogScreenState extends State<KatalogScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: _onBottomNavTapped,
+        currentIndex: Routes.routeToIndex[Routes.katalog]!,
+        onTap: (index) {
+          setState(() {
+          });
+        },
       ),
     );
   }

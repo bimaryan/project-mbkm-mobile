@@ -9,4 +9,11 @@ class Routes {
   static const String profile = '/profile';
   static const String editProfile = '/profile/edit-profile';
   static const String ubahKataSandi = '/profile/ubah-kata-sandi';
+
+  static const routeToIndex = {
+    home: 0,
+    katalog: 1,
+    informasi: 2,
+    profile: 3,
+  };
 }

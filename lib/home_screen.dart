@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:project_mbkm/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'bottom_nav_bar.dart'; // Import the bottom nav bar
 
@@ -16,7 +17,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = true;
   String? _errorMessage;
   String _selectedCategory = 'Semua'; // Default category
-  int _currentIndex = 0; // Index for Bottom Navigation Bar
 
   @override
   void initState() {
@@ -82,8 +82,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _onBottomNavTapped(int index) {
     setState(() {
-      _currentIndex =
-          index;
     });
   }
 
@@ -91,8 +89,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:
-            const Text('SILK', style: TextStyle(color: Colors.white)), // White text
+        title: const Text('SILK',
+            style: TextStyle(color: Colors.white)), // White text
         backgroundColor: const Color(0xFF0E9F6E), // Green background color
       ),
       body: Column(
@@ -177,8 +175,11 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       bottomNavigationBar: BottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: _onBottomNavTapped,
+        currentIndex: Routes.routeToIndex[Routes.home]!,
+        onTap: (index) {
+          setState(() {
+          });
+        },
       ),
     );
   }

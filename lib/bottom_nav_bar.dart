@@ -2,59 +2,41 @@ import 'package:flutter/material.dart';
 import 'package:project_mbkm/routes.dart';
 
 class BottomNavBar extends StatelessWidget {
+  final int currentIndex;
   final Function(int) onTap;
 
   const BottomNavBar({
     Key? key,
-    required this.onTap, required int currentIndex,
+    required this.currentIndex,
+    required this.onTap,
   }) : super(key: key);
-
-  int _getCurrentIndex(BuildContext context) {
-    final routeName = ModalRoute.of(context)?.settings.name;
-    switch (routeName) {
-      case Routes.home:
-        return 0;
-      case Routes.katalog:
-        return 1;
-      case Routes.informasi:
-        return 2;
-      case Routes.profile:
-        return 3;
-      default:
-        return 0; // Default to home if route is unknown
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    final currentIndex = _getCurrentIndex(context);
-
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: (index) {
-        onTap(index);
+        onTap(index); // Update the index in the parent widget
 
+        String? selectedRoute;
         switch (index) {
-          case 0: // Home
-            if (ModalRoute.of(context)?.settings.name != Routes.home) {
-              Navigator.pushReplacementNamed(context, Routes.home);
-            }
+          case 0:
+            selectedRoute = Routes.home;
             break;
-          case 1: // Katalog
-            if (ModalRoute.of(context)?.settings.name != Routes.katalog) {
-              Navigator.pushReplacementNamed(context, Routes.katalog);
-            }
+          case 1:
+            selectedRoute = Routes.katalog;
             break;
-          case 2: // Informasi
-            if (ModalRoute.of(context)?.settings.name != Routes.informasi) {
-              Navigator.pushReplacementNamed(context, Routes.informasi);
-            }
+          case 2:
+            selectedRoute = Routes.informasi;
             break;
-          case 3: // Profil
-            if (ModalRoute.of(context)?.settings.name != Routes.profile) {
-              Navigator.pushReplacementNamed(context, Routes.profile);
-            }
+          case 3:
+            selectedRoute = Routes.profile;
             break;
+        }
+
+        if (selectedRoute != null &&
+            ModalRoute.of(context)?.settings.name != selectedRoute) {
+          Navigator.pushReplacementNamed(context, selectedRoute);
         }
       },
       items: const [
@@ -75,8 +57,9 @@ class BottomNavBar extends StatelessWidget {
           label: 'Profil',
         ),
       ],
-      selectedItemColor: const Color(0xFF0E9F6E),
-      unselectedItemColor: Colors.grey,
+      selectedItemColor:
+          const Color(0xFF0E9F6E), // Green color for selected item
+      unselectedItemColor: Colors.grey, // Grey color for unselected items
     );
   }
 }
