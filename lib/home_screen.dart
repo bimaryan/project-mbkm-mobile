@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:project_mbkm/routes.dart';
+import 'package:project_mbkm/view_barang_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'bottom_nav_bar.dart';
 
@@ -155,14 +156,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               final barang = _barangs[index];
                               return InkWell(
                                 onTap: () {
-                                  Navigator.pushReplacementNamed(
+                                  Navigator.push(
                                     context,
-                                    Routes.viewBarang,
-                                    arguments: {
-                                      'token': "token", // Pass your auth token
-                                      'namaBarang': barang[
-                                          'nama_barang'], // Pass the nama_barang
-                                    },
+                                    MaterialPageRoute(
+                                      builder: (context) => ViewScreen(
+                                        token: 'token',
+                                        namaBarang: barang['nama_barang'],
+                                      ),
+                                    ),
                                   );
                                 },
                                 child: Card(

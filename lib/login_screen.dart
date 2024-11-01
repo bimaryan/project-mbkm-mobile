@@ -44,6 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
+        await prefs.setString('mahasiswa_id', data['mahasiswa_id'].toString());
 
         print('Login successful');
         print('Token: $token');
