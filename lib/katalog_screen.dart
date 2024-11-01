@@ -13,12 +13,11 @@ class KatalogScreen extends StatefulWidget {
 }
 
 class _KatalogScreenState extends State<KatalogScreen> {
-  final List<dynamic> _barangs = [];
+  List<dynamic> _barangs = [];
   bool _isLoading = true;
   String? _errorMessage;
   String _selectedCategory = 'Semua';
-  int _currentPage = 1;
-  bool _hasMoreData = true;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -27,8 +26,6 @@ class _KatalogScreenState extends State<KatalogScreen> {
   }
 
   Future<void> _fetchData() async {
-    if (!_hasMoreData) return;
-
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -37,6 +34,7 @@ class _KatalogScreenState extends State<KatalogScreen> {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('auth_token');
+      final searchQuery = _searchController.text;
 
       if (token == null) {
         setState(() {
@@ -46,9 +44,8 @@ class _KatalogScreenState extends State<KatalogScreen> {
         return;
       }
 
-      // Build the URL with pagination
       final url = Uri.parse(
-          'https://e6c7-182-0-248-96.ngrok-free.app/api/home?kategori=$_selectedCategory&page=$_currentPage');
+          'https://a32a-180-241-240-182.ngrok-free.app/api/katalog?kategori=$_selectedCategory&search=$searchQuery');
       final response = await http.get(
         url,
         headers: {
@@ -59,16 +56,9 @@ class _KatalogScreenState extends State<KatalogScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-
         setState(() {
-          // Add new items to _barangs
-          _barangs.addAll(data['barangs']);
+          _barangs = data['barangs'];
           _isLoading = false;
-          // Update _hasMoreData if the fetched data size matches our limit (6)
-          _hasMoreData = data['barangs'].length == 6;
-          if (_hasMoreData) {
-            _currentPage++; // Increment page if more data is available
-          }
         });
       } else {
         setState(() {
@@ -87,9 +77,7 @@ class _KatalogScreenState extends State<KatalogScreen> {
   void _filterBarangs(String category) {
     setState(() {
       _selectedCategory = category;
-      _currentPage = 1;
       _barangs.clear();
-      _hasMoreData = true;
     });
     _fetchData();
   }
@@ -98,122 +86,162 @@ class _KatalogScreenState extends State<KatalogScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SILK', style: TextStyle(color: Colors.white)),
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/polindra.png', // Update with your logo's file path
+              width: 30, // Adjust the width of the logo
+              height: 30, // Adjust the height of the logo
+            ),
+            const SizedBox(width: 8), // Space between logo and title
+            const Text(
+              'SILK',
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
         backgroundColor: const Color(0xFF0E9F6E),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildCategoryButton('Semua'),
-                      const SizedBox(width: 10),
-                      _buildCategoryButton('Alat'),
-                      const SizedBox(width: 10),
-                      _buildCategoryButton('Bahan'),
-                    ],
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(
+          children: [
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height:
+                          36, // Adjust the height to make the input field smaller
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 8.0, horizontal: 12.0),
+                          hintText: 'Search...',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          suffixIcon: const Icon(Icons.search,
+                              size: 20), // Adjust icon size
+                        ),
+                        onSubmitted: (value) => _fetchData(),
+                      ),
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 6),
+                  SizedBox(
+                    height: 36, // Match button height with input field
+                    child: ElevatedButton(
+                      onPressed: () => _fetchData(),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12), // Compact padding
+                        textStyle:
+                            const TextStyle(fontSize: 14), // Smaller font size
+                      ),
+                      child: const Text("Search"),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: _isLoading && _barangs.isEmpty
-                  ? const Center(child: CircularProgressIndicator())
-                  : _errorMessage != null
-                      ? Center(child: Text(_errorMessage!))
-                      : Column(
-                          children: [
-                            Expanded(
-                              child: ListView.builder(
-                                itemCount: _barangs.length + 1,
-                                itemBuilder: (context, index) {
-                                  if (index == _barangs.length) {
-                                    return _hasMoreData
-                                        ? Center(
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 8.0),
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            ),
-                                          )
-                                        : SizedBox.shrink();
-                                  }
-                                  final barang = _barangs[index];
-                                  return Card(
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    elevation: 4,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12.0),
-                                      child: Row(
-                                        children: [
-                                          Image.network(
-                                            barang['foto'] ?? '',
-                                            width: 60,
-                                            height: 60,
-                                            fit: BoxFit.cover,
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  barang['nama_barang'],
-                                                  style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  'Stok: ${barang['stok']}',
-                                                  style: const TextStyle(
-                                                    color: Colors.grey,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  'Kategori: ${barang['kategori']}',
-                                                  style: const TextStyle(
-                                                    color: Colors.grey,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildCategoryButton('Semua'),
+                  const SizedBox(width: 10),
+                  _buildCategoryButton('Alat'),
+                  const SizedBox(width: 10),
+                  _buildCategoryButton('Bahan'),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _errorMessage != null
+                        ? Center(child: Text(_errorMessage!))
+                        : ListView.builder(
+                            itemCount: _barangs.length,
+                            itemBuilder: (context, index) {
+                              final barang = _barangs[index];
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    Routes.viewBarang,
+                                    arguments: {
+                                      'token': "token", // Pass your auth token
+                                      'namaBarang': barang[
+                                          'nama_barang'], // Pass the nama_barang
+                                    },
                                   );
                                 },
-                              ),
-                            ),
-                            if (_hasMoreData && !_isLoading) // Load more button
-                              TextButton(
-                                onPressed: _fetchData,
-                                child: const Text('Load More'),
-                              ),
-                          ],
-                        ),
+                                child: Card(
+                                  margin:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 4,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Row(
+                                      children: [
+                                        Image.network(
+                                          barang['foto'] ?? '',
+                                          width: 60,
+                                          height: 60,
+                                          fit: BoxFit.cover,
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                barang['nama_barang'],
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                'Stok: ${barang['stok']}',
+                                                style: const TextStyle(
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              Text(
+                                                'Kategori: ${barang['kategori']}',
+                                                style: const TextStyle(
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: Routes.routeToIndex[Routes.katalog]!,

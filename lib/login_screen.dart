@@ -26,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final identifier = _identifierController.text;
     final password = _passwordController.text;
-    final url = Uri.parse('https://e6c7-182-0-248-96.ngrok-free.app/api/login');
+    final url = Uri.parse('https://a32a-180-241-240-182.ngrok-free.app/api/login');
 
     try {
       final response = await http.post(
