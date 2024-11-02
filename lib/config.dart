@@ -1,9 +1,7 @@
 class Config {
-  // Base URL for API
   static const String baseUrl =
-      'http://192.168.1.8:8000/api';
+      'https://c360-182-0-102-56.ngrok-free.app/api';
 
-  // Endpoints
   static const String katalogPeminjaman = '$baseUrl/katalog/peminjaman-barang';
   static const String peminjamanBarang = '$baseUrl/peminjaman';
 

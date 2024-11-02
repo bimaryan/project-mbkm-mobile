@@ -166,7 +166,7 @@ class _InformasiScreenState extends State<InformasScreen> {
                                             style: TextStyle(
                                               fontSize: 12,
                                               color: _getStatusColor(
-                                                  peminjaman), // Call the function here
+                                                  peminjaman),
                                             ),
                                           ),
                                         ],

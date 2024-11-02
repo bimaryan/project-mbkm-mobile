@@ -228,7 +228,6 @@ class _ViewScreenState extends State<ViewScreen> {
                               ),
                             const SizedBox(height: 16),
 
-                            // Details Cards
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [

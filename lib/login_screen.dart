@@ -50,7 +50,6 @@ class _LoginScreenState extends State<LoginScreen> {
         print('Login successful');
         print('Token: $token');
 
-        // Navigate to home screen or perform other actions
         Navigator.pushReplacementNamed(context, Routes.home, arguments: token);
       } else {
         final data = jsonDecode(response.body);
