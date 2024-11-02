@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:project_mbkm/config.dart';
 import 'package:project_mbkm/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -26,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     final identifier = _identifierController.text;
     final password = _passwordController.text;
-    final url = Uri.parse('https://a32a-180-241-240-182.ngrok-free.app/api/login');
+    final url = Uri.parse('${Config.baseUrl}/login');
 
     try {
       final response = await http.post(

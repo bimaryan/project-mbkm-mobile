@@ -13,12 +13,10 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const LoginScreen());
 
       case Routes.home:
-        // Retrieve the token argument if passed
         final token = settings.arguments as String? ?? '';
         return MaterialPageRoute(builder: (_) => HomeScreen(token: token));
 
       case Routes.katalog:
-        // Handle token and namaBarang arguments as a Map
         final args = settings.arguments as Map<String, dynamic>? ?? {};
         final token = args['token'] ?? '';
         return MaterialPageRoute(

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'config.dart';
 
 class ViewScreen extends StatefulWidget {
   final String namaBarang;
@@ -49,8 +50,7 @@ class _ViewScreenState extends State<ViewScreen> {
       final token = prefs.getString('auth_token');
 
       final response = await http.get(
-        Uri.parse(
-            'https://a32a-180-241-240-182.ngrok-free.app/api/katalog/peminjaman-barang/${widget.namaBarang}'),
+        Uri.parse(Config.getKatalogPeminjamanBarang(widget.namaBarang)),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -113,12 +113,15 @@ class _ViewScreenState extends State<ViewScreen> {
         return;
       }
 
-      // Get stock ID from barangData
+      // Ambil ID yang benar dari _barangData
       final String stockId = _barangData!['stock']['id'].toString();
+      final String barangId = _barangData!['id'].toString();
+
+      // Log URL untuk verifikasi
+      final url = Config.getPeminjamanEndpoint(barangId, stockId);
 
       final response = await http.post(
-        Uri.parse(
-            'https://a32a-180-241-240-182.ngrok-free.app/api/peminjaman/${_barangData!['id']}/$stockId'),
+        Uri.parse(url),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

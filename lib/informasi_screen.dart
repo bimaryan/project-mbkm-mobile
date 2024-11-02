@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:project_mbkm/config.dart';
 import 'package:project_mbkm/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'bottom_nav_bar.dart';
@@ -44,8 +45,7 @@ class _InformasiScreenState extends State<InformasScreen> {
         return;
       }
 
-      final url = Uri.parse(
-          'https://a32a-180-241-240-182.ngrok-free.app/api/informasi?page=$page');
+      final url = Uri.parse('${Config.baseUrl}/informasi?page=$page');
       final response = await http.get(
         url,
         headers: {
@@ -149,11 +149,27 @@ class _InformasiScreenState extends State<InformasScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        '${peminjaman['mahasiswa']['nama']}',
-                                        style: const TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              '${peminjaman['mahasiswa']['nama']}',
+                                              style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          Text(
+                                            '${peminjaman['status']}',
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: _getStatusColor(
+                                                  peminjaman), // Call the function here
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                       const SizedBox(height: 8),
                                       if (peminjaman['barang']['foto'] != null)
@@ -205,5 +221,22 @@ class _InformasiScreenState extends State<InformasScreen> {
         },
       ),
     );
+  }
+
+  _getStatusColor(peminjaman) {
+    Color _getStatusColor(Map<String, dynamic> peminjaman) {
+      String status = peminjaman['status'];
+
+      switch (status) {
+        case 'Dipinjam':
+          return Colors.green;
+        case 'Dikembalikan':
+          return Colors.purple;
+        case 'Menunggu Persetujuan':
+          return Colors.yellow;
+        default:
+          return Colors.black;
+      }
+    }
   }
 }

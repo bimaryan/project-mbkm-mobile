@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:project_mbkm/config.dart';
 import 'package:project_mbkm/routes.dart';
 import 'package:project_mbkm/view_barang_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,8 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
       }
 
       // Build the URL without pagination
-      final url = Uri.parse(
-          'https://a32a-180-241-240-182.ngrok-free.app/api/home?kategori=$_selectedCategory');
+      final url =
+          Uri.parse('${Config.baseUrl}/home?kategori=$_selectedCategory');
       final response = await http.get(
         url,
         headers: {

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:project_mbkm/bottom_nav_bar.dart';
+import 'package:project_mbkm/config.dart';
 import 'package:project_mbkm/routes.dart';
 import 'package:project_mbkm/view_barang_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -46,7 +47,7 @@ class _KatalogScreenState extends State<KatalogScreen> {
       }
 
       final url = Uri.parse(
-          'https://a32a-180-241-240-182.ngrok-free.app/api/katalog?kategori=$_selectedCategory&search=$searchQuery');
+          '${Config.baseUrl}/katalog?kategori=$_selectedCategory&search=$searchQuery');
       final response = await http.get(
         url,
         headers: {
