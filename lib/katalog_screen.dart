@@ -141,7 +141,7 @@ class _KatalogScreenState extends State<KatalogScreen> {
                       onPressed: () => _fetchData(),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12), // Compact padding
+                            horizontal: 12),
                         textStyle:
                             const TextStyle(fontSize: 14), // Smaller font size
                       ),
