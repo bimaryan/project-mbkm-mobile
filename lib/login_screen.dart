@@ -187,7 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       color: Color(0xFF0E9F6E)), // Border color
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                     vertical: 10.0, horizontal: 12.0),
                               ),
                             ),
@@ -211,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       color: Color(0xFF0E9F6E)), // Border color
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                     vertical: 10.0, horizontal: 12.0),
                               ),
                               obscureText: true,

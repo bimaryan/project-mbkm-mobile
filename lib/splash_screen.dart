@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import './routes.dart';
 
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
@@ -16,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkLoginStatus() async {
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 2));
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('auth_token');

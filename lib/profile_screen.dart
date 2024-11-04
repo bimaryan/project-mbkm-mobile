@@ -107,7 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _errorMessage = 'Failed to update profile: ${response.statusCode}';
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update profile')),
+        const SnackBar(content: Text('Failed to update profile')),
       );
     }
   }
@@ -289,7 +289,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showResetPasswordModal(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
     String? newPassword;
     String? confirmPassword;
 
@@ -303,13 +303,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Form(
-              key: _formKey,
+              key: formKey,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextFormField(
                     obscureText: true,
-                    decoration: InputDecoration(labelText: 'New Password'),
+                    decoration: const InputDecoration(labelText: 'New Password'),
                     validator: (value) => value == null || value.isEmpty
                         ? 'New password is required'
                         : null,
@@ -317,7 +317,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   TextFormField(
                     obscureText: true,
-                    decoration: InputDecoration(labelText: 'Confirm Password'),
+                    decoration: const InputDecoration(labelText: 'Confirm Password'),
                     validator: (value) =>
                         value != newPassword ? 'Passwords do not match' : null,
                     onChanged: (value) => confirmPassword = value,
@@ -325,15 +325,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
+                      if (formKey.currentState!.validate()) {
                         await _resetPassword(newPassword, confirmPassword);
                         Navigator.of(context).pop(); // Close the dialog
                       }
                     },
-                    child: Text('Reset Password'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0E9F6E),
                     ),
+                    child: Text('Reset Password'),
                   ),
                 ],
               ),
@@ -345,7 +345,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showEditProfileModal(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
     String? name = _mahasiswa?['nama'];
     String? email = _mahasiswa?['email'];
     String? telepon = _mahasiswa?['telepon'];
@@ -361,13 +361,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Form(
-              key: _formKey,
+              key: formKey,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextFormField(
                     initialValue: name,
-                    decoration: InputDecoration(labelText: 'Nama'),
+                    decoration: const InputDecoration(labelText: 'Nama'),
                     validator: (value) => value == null || value.isEmpty
                         ? 'Nama harus diisi'
                         : null,
@@ -375,7 +375,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   TextFormField(
                     initialValue: email,
-                    decoration: InputDecoration(labelText: 'Email'),
+                    decoration: const InputDecoration(labelText: 'Email'),
                     validator: (value) => value == null || value.isEmpty
                         ? 'Email harus diisi'
                         : null,
@@ -384,34 +384,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   TextFormField(
                     initialValue: telepon,
                     decoration:
-                        InputDecoration(labelText: 'Telepon (optional)'),
+                        const InputDecoration(labelText: 'Telepon (optional)'),
                     onChanged: (value) => telepon = value,
                   ),
                   DropdownButtonFormField<String>(
                     value: jenisKelamin,
-                    items: [
+                    items: const [
                       DropdownMenuItem(
-                          child: Text("Laki-laki"), value: "Laki-laki"),
+                          value: "Laki-laki",
+                          child: Text("Laki-laki")),
                       DropdownMenuItem(
-                          child: Text("Perempuan"), value: "Perempuan"),
+                          value: "Perempuan",
+                          child: Text("Perempuan")),
                     ],
                     onChanged: (value) => jenisKelamin = value,
                     decoration:
-                        InputDecoration(labelText: 'Jenis Kelamin (optional)'),
+                        const InputDecoration(labelText: 'Jenis Kelamin (optional)'),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
+                      if (formKey.currentState!.validate()) {
                         await _updateProfile(
                             name, email, telepon, jenisKelamin);
                         Navigator.of(context).pop(); // Close the dialog
                       }
                     },
-                    child: Text('Simpan'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0E9F6E),
                     ),
+                    child: Text('Simpan'),
                   ),
                 ],
               ),

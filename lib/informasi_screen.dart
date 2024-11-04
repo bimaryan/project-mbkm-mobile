@@ -17,13 +17,13 @@ class InformasScreen extends StatefulWidget {
 }
 
 class _InformasiScreenState extends State<InformasScreen> {
-  FlutterLocalNotificationsPlugin _notificationsPlugin =
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
   bool _isLoading = true;
   String? _errorMessage;
   List<dynamic> _peminjamanData = [];
   List<String> _previousStatuses = [];
-  int _currentPage = 1;
+  final int _currentPage = 1;
   bool _hasMoreData = true;
   Timer? _pollingTimer;
 
