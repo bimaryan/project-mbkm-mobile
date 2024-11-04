@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:project_mbkm/route_generator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import './routes.dart';
 
 void main() {
