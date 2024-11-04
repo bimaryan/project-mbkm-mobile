@@ -67,7 +67,7 @@ class _InformasiScreenState extends State<InformasScreen> {
   }
 
   void _startPolling() {
-    _pollingTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+    _pollingTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
       _fetchData(_currentPage);
     });
   }
@@ -156,94 +156,131 @@ class _InformasiScreenState extends State<InformasScreen> {
         automaticallyImplyLeading: false,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(16.0),
         child: Center(
-          child: _isLoading && _peminjamanData.isEmpty
+          child: _isLoading
               ? const CircularProgressIndicator()
               : _errorMessage != null
                   ? Center(child: Text(_errorMessage!))
-                  : Column(
-                      children: [
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: _peminjamanData.length,
-                            itemBuilder: (context, index) {
-                              final peminjaman = _peminjamanData[index];
-                              return Card(
-                                margin:
-                                    const EdgeInsets.symmetric(vertical: 8.0),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
+                  : _peminjamanData.isEmpty
+                      ? const Center(child: Text('No data available.'))
+                      : Column(
+                          children: [
+                            // Add the notification card
+                            Card(
+                              color: Colors.yellow[100], // Light yellow color
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 4,
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.info_outline,
+                                      color: Colors.yellow,
+                                      size: 30,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        "Pemberitahuan! Silahkan datang ke lab terpadu untuk mengambil atau mengembalikan barang yang dipinjam, sertakan bukti peminjaman.",
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                elevation: 4,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                              ),
+                            ),
+                            const SizedBox(
+                                height:
+                                    16), // Space between the card and the list
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: _peminjamanData.length,
+                                itemBuilder: (context, index) {
+                                  final peminjaman = _peminjamanData[index];
+                                  return Card(
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    elevation: 4,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Expanded(
-                                            child: Text(
-                                              '${peminjaman['mahasiswa']['nama']}',
-                                              style: const TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  '${peminjaman['mahasiswa']['nama']}',
+                                                  style: const TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                              Text(
+                                                '${peminjaman['status']}',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: _getStatusColor(
+                                                      peminjaman),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 8),
+                                          if (peminjaman['barang']['foto'] !=
+                                              null)
+                                            Image.network(
+                                              peminjaman['barang']['foto'],
+                                              width: double.infinity,
+                                              height: 200,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            '${peminjaman['barang']['nama_barang']}',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
+                                          const SizedBox(height: 8),
                                           Text(
-                                            '${peminjaman['status']}',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color:
-                                                  _getStatusColor(peminjaman),
-                                            ),
+                                            'Tanggal Pinjam: ${DateTime.fromMillisecondsSinceEpoch(peminjaman['waktu_pinjam_unix'] * 1000).toLocal().toString().split(" ")[0]}',
+                                            style:
+                                                const TextStyle(fontSize: 14),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Waktu Pinjam: ${DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(peminjaman['waktu_pinjam_unix'] * 1000).toLocal())}',
+                                            style: const TextStyle(
+                                                color: Colors.grey),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Waktu Kembali: ${DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(peminjaman['waktu_kembali_unix'] * 1000).toLocal())}',
+                                            style: const TextStyle(
+                                                color: Colors.grey),
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 8),
-                                      if (peminjaman['barang']['foto'] != null)
-                                        Image.network(
-                                          peminjaman['barang']['foto'],
-                                          width: double.infinity,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        '${peminjaman['barang']['nama_barang']}',
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'Tanggal Pinjam: ${DateTime.fromMillisecondsSinceEpoch(peminjaman['waktu_pinjam_unix'] * 1000).toLocal().toString().split(" ")[0]}',
-                                        style: const TextStyle(fontSize: 14),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Waktu Pinjam: ${DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(peminjaman['waktu_pinjam_unix'] * 1000).toLocal())}',
-                                        style:
-                                            const TextStyle(color: Colors.grey),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Waktu Kembali: ${DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(peminjaman['waktu_kembali_unix'] * 1000).toLocal())}',
-                                        style:
-                                            const TextStyle(color: Colors.grey),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
         ),
       ),
       bottomNavigationBar: BottomNavBar(

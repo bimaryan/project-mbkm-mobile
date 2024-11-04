@@ -150,6 +150,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _logout() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+    final url = Uri.parse('${Config.baseUrl}/logout');
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      prefs.remove('auth_token'); // Clear auth token
+      Navigator.of(context)
+          .pushReplacementNamed(Routes.login); // Navigate to login
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Logout berhasil')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to logout')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -258,6 +285,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     label: const Text('Edit Profile'),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xFF0E9F6E),
+                                      foregroundColor: Colors.white,
                                     ),
                                   ),
                                   ElevatedButton.icon(
@@ -268,12 +296,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     label: const Text('Reset Password'),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xFF0E9F6E),
+                                      foregroundColor: Colors.white,
                                     ),
                                   ),
                                 ],
                               ),
                             ],
                           ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Logout Button
+                      ElevatedButton.icon(
+                        onPressed: _logout,
+                        icon: const Icon(Icons.logout),
+                        label: const Text('Logout'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 48),
                         ),
                       ),
                     ],
@@ -309,7 +350,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   TextFormField(
                     obscureText: true,
-                    decoration: const InputDecoration(labelText: 'New Password'),
+                    decoration:
+                        const InputDecoration(labelText: 'New Password'),
                     validator: (value) => value == null || value.isEmpty
                         ? 'New password is required'
                         : null,
@@ -317,7 +359,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   TextFormField(
                     obscureText: true,
-                    decoration: const InputDecoration(labelText: 'Confirm Password'),
+                    decoration:
+                        const InputDecoration(labelText: 'Confirm Password'),
                     validator: (value) =>
                         value != newPassword ? 'Passwords do not match' : null,
                     onChanged: (value) => confirmPassword = value,
@@ -327,11 +370,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onPressed: () async {
                       if (formKey.currentState!.validate()) {
                         await _resetPassword(newPassword, confirmPassword);
-                        Navigator.of(context).pop(); // Close the dialog
+                        Navigator.of(context).pop();
                       }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0E9F6E),
+                      foregroundColor: Colors.white,
                     ),
                     child: Text('Reset Password'),
                   ),
@@ -391,15 +435,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     value: jenisKelamin,
                     items: const [
                       DropdownMenuItem(
-                          value: "Laki-laki",
-                          child: Text("Laki-laki")),
+                          value: "Laki-laki", child: Text("Laki-laki")),
                       DropdownMenuItem(
-                          value: "Perempuan",
-                          child: Text("Perempuan")),
+                          value: "Perempuan", child: Text("Perempuan")),
                     ],
                     onChanged: (value) => jenisKelamin = value,
-                    decoration:
-                        const InputDecoration(labelText: 'Jenis Kelamin (optional)'),
+                    decoration: const InputDecoration(
+                        labelText: 'Jenis Kelamin (optional)'),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
@@ -412,6 +454,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF0E9F6E),
+                      foregroundColor: Colors.white,
                     ),
                     child: Text('Simpan'),
                   ),

@@ -91,11 +91,11 @@ class _KatalogScreenState extends State<KatalogScreen> {
         title: Row(
           children: [
             Image.asset(
-              'assets/images/polindra.png', // Update with your logo's file path
-              width: 30, // Adjust the width of the logo
-              height: 30, // Adjust the height of the logo
+              'assets/images/polindra.png',
+              width: 30,
+              height: 30,
             ),
-            const SizedBox(width: 8), // Space between logo and title
+            const SizedBox(width: 8),
             const Text(
               'SILK',
               style: TextStyle(color: Colors.white),
@@ -116,8 +116,7 @@ class _KatalogScreenState extends State<KatalogScreen> {
                 children: [
                   Expanded(
                     child: SizedBox(
-                      height:
-                          36, // Adjust the height to make the input field smaller
+                      height: 36,
                       child: TextField(
                         controller: _searchController,
                         decoration: InputDecoration(
@@ -140,8 +139,9 @@ class _KatalogScreenState extends State<KatalogScreen> {
                     child: ElevatedButton(
                       onPressed: () => _fetchData(),
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12),
+                        backgroundColor: const Color(0xFF0E9F6E),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
                         textStyle:
                             const TextStyle(fontSize: 14), // Smaller font size
                       ),

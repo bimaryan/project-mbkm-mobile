@@ -24,9 +24,15 @@ class _SplashScreenState extends State<SplashScreen> {
     final token = prefs.getString('auth_token');
 
     if (token != null) {
-      Navigator.of(context).pushReplacementNamed(Routes.home);
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        Routes.home,
+        (route) => false,
+      );
     } else {
-      Navigator.of(context).pushReplacementNamed(Routes.login);
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        Routes.login,
+        (route) => false,
+      );
     }
   }
 
@@ -37,8 +43,8 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Center(
         child: Image.asset(
           'assets/images/silk-transparant.png',
-          width: 150, // Adjust size as needed
-          height: 150,
+          width: 200, // Adjust size as needed
+          height: 200,
         ),
       ),
     );

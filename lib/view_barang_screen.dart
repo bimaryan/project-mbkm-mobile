@@ -390,6 +390,10 @@ class _ViewScreenState extends State<ViewScreen> {
                             ElevatedButton(
                               onPressed: _submitBorrowing,
                               child: const Text('Pinjam Barang'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF0E9F6E),
+                                foregroundColor: Colors.white,
+                              ),
                             ),
                           ],
                         ),

@@ -18,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
+  bool _isPasswordVisible = false; 
 
   Future<void> loginUser() async {
     setState(() {
@@ -198,6 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: TextStyle(color: Color(0xFF0E9F6E)),
                             ),
                             const SizedBox(height: 10),
+                            // Password field with eye icon
                             TextField(
                               controller: _passwordController,
                               decoration: InputDecoration(
@@ -213,8 +215,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(
                                     vertical: 10.0, horizontal: 12.0),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _isPasswordVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: const Color(0xFF0E9F6E),
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _isPasswordVisible =
+                                          !_isPasswordVisible; // Toggle visibility
+                                    });
+                                  },
+                                ),
                               ),
-                              obscureText: true,
+                              obscureText:
+                                  !_isPasswordVisible, // Toggle based on the boolean variable
                             ),
                             const SizedBox(height: 20),
                             SizedBox(
@@ -222,12 +239,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: ElevatedButton(
                                 onPressed: _isLoading ? null : loginUser,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      const Color(0xFF0E9F6E), // Button color
+                                  backgroundColor: const Color(0xFF0E9F6E),
+                                  foregroundColor: Colors.white,
                                 ),
                                 child: _isLoading
                                     ? const CircularProgressIndicator()
-                                    : const Text('Login'),
+                                    : const Text(
+                                        'Login',
+                                        style: TextStyle(fontSize: 18),
+                                      ),
                               ),
                             ),
                           ],
