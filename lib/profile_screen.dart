@@ -76,8 +76,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('auth_token');
     final url = Uri.parse(
-        '${Config.baseUrl}/profile/edit-profile/${_mahasiswa?['id']}'); // Assume `id` is available
-
+        '${Config.baseUrl}/profile/edit-profile/${_mahasiswa?['id']}');
     final response = await http.put(
       url,
       headers: {
@@ -113,6 +112,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _resetPassword(String? password, String? confirmPassword) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('auth_token');
+
+    if (token == null || _mahasiswa == null) {
+      setState(() {
+        _errorMessage = 'User is not authenticated or profile data is missing.';
+      });
+      return;
+    }
+
+    final url = Uri.parse(
+        '${Config.baseUrl}/profile/ubah-kata-sandi/${_mahasiswa!['id']}');
+    final response = await http.put(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'password': password,
+        'konfirmasi_password': confirmPassword,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(data['message'])),
+      );
+    } else {
+      final error = jsonDecode(response.body)['error'];
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(error ?? 'Failed to reset password')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,6 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
         backgroundColor: const Color(0xFF0E9F6E),
+        automaticallyImplyLeading: false,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -208,15 +246,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               const SizedBox(height: 20),
                               // Edit Button
-                              ElevatedButton.icon(
-                                onPressed: () {
-                                  _showEditProfileModal(context);
-                                },
-                                icon: const Icon(Icons.edit),
-                                label: const Text('Edit Profile'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF0E9F6E),
-                                ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      _showEditProfileModal(context);
+                                    },
+                                    icon: const Icon(Icons.edit),
+                                    label: const Text('Edit Profile'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF0E9F6E),
+                                    ),
+                                  ),
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      _showResetPasswordModal(context);
+                                    },
+                                    icon: const Icon(Icons.lock_reset),
+                                    label: const Text('Reset Password'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF0E9F6E),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -231,6 +285,62 @@ class _ProfileScreenState extends State<ProfileScreen> {
           setState(() {});
         },
       ),
+    );
+  }
+
+  void _showResetPasswordModal(BuildContext context) {
+    final _formKey = GlobalKey<FormState>();
+    String? newPassword;
+    String? confirmPassword;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    obscureText: true,
+                    decoration: InputDecoration(labelText: 'New Password'),
+                    validator: (value) => value == null || value.isEmpty
+                        ? 'New password is required'
+                        : null,
+                    onChanged: (value) => newPassword = value,
+                  ),
+                  TextFormField(
+                    obscureText: true,
+                    decoration: InputDecoration(labelText: 'Confirm Password'),
+                    validator: (value) =>
+                        value != newPassword ? 'Passwords do not match' : null,
+                    onChanged: (value) => confirmPassword = value,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        await _resetPassword(newPassword, confirmPassword);
+                        Navigator.of(context).pop(); // Close the dialog
+                      }
+                    },
+                    child: Text('Reset Password'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0E9F6E),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

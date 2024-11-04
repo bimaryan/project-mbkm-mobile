@@ -5,7 +5,7 @@ class Routes {
   static const String viewBarang = '/katalog/peminjaman-barang';
   static const String peminjaman = '/peminjaman';
   static const String informasi = '/informasi';
-
+  static const String splash = '/splash';
   static const String profile = '/profile';
   static const String editProfile = '/profile/edit-profile';
   static const String ubahKataSandi = '/profile/ubah-kata-sandi';

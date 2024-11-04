@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -6,6 +7,7 @@ import 'package:project_mbkm/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'bottom_nav_bar.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class InformasScreen extends StatefulWidget {
   const InformasScreen({super.key, required String token});
@@ -15,16 +17,59 @@ class InformasScreen extends StatefulWidget {
 }
 
 class _InformasiScreenState extends State<InformasScreen> {
+  FlutterLocalNotificationsPlugin _notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
   bool _isLoading = true;
   String? _errorMessage;
   List<dynamic> _peminjamanData = [];
+  List<String> _previousStatuses = [];
   int _currentPage = 1;
   bool _hasMoreData = true;
+  Timer? _pollingTimer;
 
   @override
   void initState() {
     super.initState();
+    _initializeNotifications();
     _fetchData(_currentPage);
+    _startPolling();
+  }
+
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    super.dispose();
+  }
+
+  void _initializeNotifications() {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+    );
+
+    _notificationsPlugin.initialize(initializationSettings);
+  }
+
+  Future<void> _showNotification(String title, String body) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails('status_channel', 'Status Updates',
+            importance: Importance.max,
+            priority: Priority.high,
+            showWhen: false);
+
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await _notificationsPlugin.show(0, title, body, platformChannelSpecifics);
+  }
+
+  void _startPolling() {
+    _pollingTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      _fetchData(_currentPage);
+    });
   }
 
   Future<void> _fetchData(int page) async {
@@ -56,10 +101,24 @@ class _InformasiScreenState extends State<InformasScreen> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        List<dynamic> newData = data['peminjaman']['data'];
+        for (int i = 0; i < newData.length; i++) {
+          String newStatus = newData[i]['status'];
+          if (i < _previousStatuses.length &&
+              _previousStatuses[i] != newStatus) {
+            await _showNotification(
+              'Status Updated',
+              'The status of ${newData[i]['barang']['nama_barang']} has changed to $newStatus',
+            );
+          }
+        }
+
         setState(() {
-          _peminjamanData.addAll(data['peminjaman']['data']);
+          _peminjamanData = newData; // Replace data to avoid duplication
           _isLoading = false;
           _hasMoreData = data['peminjaman']['next_page_url'] != null;
+          _previousStatuses =
+              newData.map((item) => item['status'] as String).toList();
         });
       } else {
         setState(() {
@@ -72,15 +131,6 @@ class _InformasiScreenState extends State<InformasScreen> {
         _errorMessage = 'An error occurred. Please try again.';
         _isLoading = false;
       });
-    }
-  }
-
-  void _loadMore() {
-    if (_hasMoreData && !_isLoading) {
-      setState(() {
-        _currentPage++;
-      });
-      _fetchData(_currentPage);
     }
   }
 
@@ -103,6 +153,7 @@ class _InformasiScreenState extends State<InformasScreen> {
           ],
         ),
         backgroundColor: const Color(0xFF0E9F6E),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -115,26 +166,8 @@ class _InformasiScreenState extends State<InformasScreen> {
                       children: [
                         Expanded(
                           child: ListView.builder(
-                            itemCount: _peminjamanData.length + 1,
+                            itemCount: _peminjamanData.length,
                             itemBuilder: (context, index) {
-                              if (index == _peminjamanData.length) {
-                                return _hasMoreData
-                                    ? Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Center(
-                                          child: TextButton(
-                                            onPressed: _loadMore,
-                                            child: const Text(
-                                              'Load More',
-                                              style: TextStyle(
-                                                  color: Color(0xFF0E9F6E)),
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    : const SizedBox();
-                              }
-
                               final peminjaman = _peminjamanData[index];
                               return Card(
                                 margin:
@@ -165,8 +198,8 @@ class _InformasiScreenState extends State<InformasScreen> {
                                             '${peminjaman['status']}',
                                             style: TextStyle(
                                               fontSize: 12,
-                                              color: _getStatusColor(
-                                                  peminjaman),
+                                              color:
+                                                  _getStatusColor(peminjaman),
                                             ),
                                           ),
                                         ],
@@ -175,7 +208,6 @@ class _InformasiScreenState extends State<InformasScreen> {
                                       if (peminjaman['barang']['foto'] != null)
                                         Image.network(
                                           peminjaman['barang']['foto'],
-                                          height: 100,
                                           width: double.infinity,
                                           fit: BoxFit.cover,
                                         ),
@@ -223,20 +255,18 @@ class _InformasiScreenState extends State<InformasScreen> {
     );
   }
 
-  _getStatusColor(peminjaman) {
-    Color _getStatusColor(Map<String, dynamic> peminjaman) {
-      String status = peminjaman['status'];
+  Color _getStatusColor(Map<String, dynamic> peminjaman) {
+    String status = peminjaman['status'];
 
-      switch (status) {
-        case 'Dipinjam':
-          return Colors.green;
-        case 'Dikembalikan':
-          return Colors.purple;
-        case 'Menunggu Persetujuan':
-          return Colors.yellow;
-        default:
-          return Colors.black;
-      }
+    switch (status) {
+      case 'Dipinjam':
+        return Colors.green;
+      case 'Dikembalikan':
+        return Colors.purple;
+      case 'Menunggu Persetujuan':
+        return Colors.yellow;
+      default:
+        return Colors.black;
     }
   }
 }

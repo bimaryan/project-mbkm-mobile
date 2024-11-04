@@ -102,6 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         backgroundColor: const Color(0xFF0E9F6E),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
@@ -117,15 +118,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(
                       16.0), // Internal padding for card content
-                  child: Text(
-                    "Sistem Laboratorium Kesehatan adalah sebuah sistem berbasis teknologi yang dirancang untuk mempermudah proses peminjaman, pengembalian, serta pengelolaan inventaris laboratorium secara digital.",
-                    style: TextStyle(
-                      fontSize: 16, // Adjust font size as needed
-                      color: Colors.black87, // Text color
-                      height: 1.5, // Line height for readability
-                    ),
-                    textAlign:
-                        TextAlign.justify, // Justify text for a clean look
+                  child: Image.asset(
+                    'assets/images/gedungGSC.jpg', // Path to the image in assets
+                    fit: BoxFit.cover, // Adjust fit as needed
                   ),
                 ),
               ),

@@ -1,6 +1,6 @@
 class Config {
   static const String baseUrl =
-      'https://c360-182-0-102-56.ngrok-free.app/api';
+      'https://a3e9-2001-448a-3010-a982-8-d6f9-9213-1d2d.ngrok-free.app/api';
 
   static const String katalogPeminjaman = '$baseUrl/katalog/peminjaman-barang';
   static const String peminjamanBarang = '$baseUrl/peminjaman';

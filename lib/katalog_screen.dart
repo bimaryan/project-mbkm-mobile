@@ -103,6 +103,7 @@ class _KatalogScreenState extends State<KatalogScreen> {
           ],
         ),
         backgroundColor: const Color(0xFF0E9F6E),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
